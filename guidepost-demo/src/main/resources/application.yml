@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    # set transaction isolation to READ-COMMITTED instead of default value REPEATABLE-READ
+    # reset SQL_MODE to msyql default sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'
+    #url: jdbc:mysql://127.0.0.1:3306/test?characterEncoding=utf-8&allowMultiQueries=true&zeroDateTimeBehavior=convertToNull&serverTimezone=Asia/Shanghai&useLegacyDatetimeCode=false&sessionVariables=transaction_isolation='READ-COMMITTED',sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'
+    url: jdbc:mysql://centos-61:3306/test?characterEncoding=utf-8&allowMultiQueries=true&zeroDateTimeBehavior=convertToNull&serverTimezone=Asia/Shanghai&useLegacyDatetimeCode=false&sessionVariables=sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'
+    #password: "test-P&*3231;/87"
+    username: test
+
+    #    url: jdbc:mysql:replication://172.25.240.61:3306,172.25.240.62:3306,172.25.240.63:3306,172.25.240.64:3306/test?allowSourceDownConnections=true&allowReplicasDownConnections=true&characterEncoding=utf-8&allowMultiQueries=true&zeroDateTimeBehavior=convertToNull&serverTimezone=Asia/Shanghai&useLegacyDatetimeCode=false&sessionVariables=sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'
+    password: "test-z;371aNPU"
+    autoCommit: false
+    hikari:
+      minimumIdle: 2
+      maximumPoolSize: 10
+  jpa:
+    generate-ddl: true
+    properties:
+      hibernate:
+        connection:
+          handling_mode: "DELAYED_ACQUISITION_AND_RELEASE_AFTER_TRANSACTION"
+logging:
+  level:
+    org:
+      coderclan: trace
+
+
