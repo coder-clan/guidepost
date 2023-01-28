@@ -1,10 +1,9 @@
 package org.coderclan.guidepost;
 
 
-import com.zaxxer.hikari.HikariDataSource;
 import org.coderclan.guidepost.datasource.*;
+import org.coderclan.guidepost.mysql.InnoDbClusterNodeDiscovery;
 import org.coderclan.guidepost.mysql.MysqlDataSourceChecker;
-import org.coderclan.guidepost.mysql.MysqlDatabaseNodeDiscovery;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -19,7 +18,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import javax.sql.DataSource;
 
 /**
- * TODO change me.
+ * Configuration for the Guidepost.
  *
  * @author aray(dot)chou(dot)cn(at)gmail(dot)com
  * @date 2023/1/5
@@ -28,13 +27,19 @@ import javax.sql.DataSource;
 @EnableConfigurationProperties({DataSourceProperties.class})
 @ConditionalOnClass({DataSource.class, EmbeddedDatabaseType.class})
 @AutoConfigureBefore({DataSourceAutoConfiguration.class})
-public class DataSourceConfig {
+public class GuidepostConfig {
 
     @Bean
     @ConditionalOnClass(name = "com.mysql.cj.jdbc.Driver")
     @ConditionalOnMissingBean
     public DataSourceChecker mysqlDataSourceChecker() {
         return new MysqlDataSourceChecker();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ReadWriteDetector springTransactionReadWriteDetector() {
+        return new SpringTransactionReadWriteDetector();
     }
 
     @Bean
@@ -48,11 +53,11 @@ public class DataSourceConfig {
     @ConditionalOnClass(name = "com.mysql.cj.jdbc.Driver")
     @ConditionalOnMissingBean
     public DatabaseNodeDiscovery databaseNodeDiscovery() {
-        return new MysqlDatabaseNodeDiscovery();
+        return new InnoDbClusterNodeDiscovery();
     }
 
     @Bean
-    @ConditionalOnClass(name="com.zaxxer.hikari.HikariDataSource")
+    @ConditionalOnClass(name = "com.zaxxer.hikari.HikariDataSource")
     @ConditionalOnMissingBean
     public DataSourceBuilder dataSourceBuilder() {
         return new HikariDataSourceBuilder();

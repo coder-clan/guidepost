@@ -11,9 +11,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- * TODO change me.
+ * DataSourceChecker implementation for MySQL
  *
- * @author TODO
+ * @author aray(dot)chou(dot)cn(at)gmail(dot)com
  * @date 2023/1/16
  */
 public class MysqlDataSourceChecker implements DataSourceChecker {

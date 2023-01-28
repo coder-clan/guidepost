@@ -13,9 +13,9 @@ import java.util.Objects;
 import java.util.logging.Logger;
 
 /**
- * TODO change me.
+ * {@link DataSource} with identity.
  *
- * @author TODO
+ * @author aray(dot)chou(dot)cn(at)gmail(dot)com
  * @date 2023/1/16
  */
 public class NamedDataSource implements DataSource, Closeable {
@@ -23,6 +23,10 @@ public class NamedDataSource implements DataSource, Closeable {
     private String name;
     private DataSource delegated;
 
+    /**
+     * @param name      The name of the DataSource, should be unique.
+     * @param delegated The underlying dataSource.
+     */
     public NamedDataSource(String name, DataSource delegated) {
         this.name = name;
         this.delegated = delegated;

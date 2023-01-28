@@ -3,7 +3,7 @@ package org.coderclan.guidepost.datasource;
 import javax.sql.DataSource;
 
 /**
- * TODO change me.
+ * Check the DataSource whether if it is readonly.
  *
  * @author aray(dot)chou(dot)cn(at)gmail(dot)com
  * @date 2023/1/13

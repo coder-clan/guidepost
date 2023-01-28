@@ -10,9 +10,13 @@ import org.springframework.core.env.Environment;
 import java.util.Objects;
 
 /**
- * TODO change me.
+ * DataSourceBuilder using HikariCP.
+ * <p>
+ * It will use configuration properties <code>spring.datasource.*</code> and <code>spring.datasource.hikari.*</code> to create Hikari DataSource.
+ * <p>
+ * see also {@link org.springframework.boot.autoconfigure.jdbc.DataSourceConfiguration.Hikari}.
  *
- * @author TODO
+ * @author aray(dot)chou(dot)cn(at)gmail(dot)com
  * @date 2023/1/17
  */
 public class HikariDataSourceBuilder implements DataSourceBuilder {

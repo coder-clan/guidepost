@@ -1,11 +1,12 @@
 package org.coderclan.guidepost.mysql;
 
-import com.zaxxer.hikari.HikariDataSource;
-import org.coderclan.guidepost.datasource.*;
+import org.coderclan.guidepost.datasource.DataSourceBuilder;
+import org.coderclan.guidepost.datasource.DataSourceChecker;
+import org.coderclan.guidepost.datasource.DatabaseNodeDiscovery;
+import org.coderclan.guidepost.datasource.NamedDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 
 import javax.sql.DataSource;
 import java.io.Closeable;
@@ -16,25 +17,27 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 /**
- * TODO change me.
+ * DatabaseNodeDiscovery implementation for MySQL InnoDB Cluster
  *
- * @author TODO
+ * @author aray(dot)chou(dot)cn(at)gmail(dot)com
  * @date 2023/1/14
  */
-public class MysqlDatabaseNodeDiscovery implements DatabaseNodeDiscovery {
-    private static Logger log = LoggerFactory.getLogger(MysqlDatabaseNodeDiscovery.class);
+public class InnoDbClusterNodeDiscovery implements DatabaseNodeDiscovery {
+    private static Logger log = LoggerFactory.getLogger(InnoDbClusterNodeDiscovery.class);
 
-    private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-
-    @Autowired
-    private DataSourceProperties properties;
+    private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
+        @Override
+        public Thread newThread(Runnable r) {
+            Thread t = new Thread(r);
+            t.setDaemon(true);
+            t.setName("InnoDB-Discovery");
+            return t;
+        }
+    });
 
     @Autowired
     private DataSourceChecker checker;
