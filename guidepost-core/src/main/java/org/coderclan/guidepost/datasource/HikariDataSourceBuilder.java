@@ -92,9 +92,16 @@ public class HikariDataSourceBuilder implements DataSourceBuilder {
     private String getAddress(DataSourceProperties properties) {
         String url = properties.getUrl();
 
-        // JDBC URL should be like foo:boor:buz://host:port/xxx
-        int beginIndex = url.indexOf("://") + "://".length();
+        // JDBC URL should be like foo:bar:buz://host:port/xxx
+        final int indexOfDoubleSlash = url.indexOf("://");
+
+        // some JDBC URL like this: jdbc:h2:mem:example;NON_KEYWORDS=VALUE
+        if (indexOfDoubleSlash < 0) {
+            return null;
+        }
+
+        int beginIndex = indexOfDoubleSlash + "://".length();
         int endIndex = url.indexOf('/', beginIndex);
-        return url.substring(beginIndex, endIndex);
+        return endIndex >= 0 ? url.substring(beginIndex, endIndex) : url.substring(beginIndex);
     }
 }

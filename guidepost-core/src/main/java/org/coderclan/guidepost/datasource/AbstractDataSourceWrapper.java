@@ -14,51 +14,51 @@ import java.util.logging.Logger;
  * @date 2023/1/5
  */
 public abstract class AbstractDataSourceWrapper implements DataSource {
-    abstract protected DataSource getDatasource();
+    abstract protected DataSource findDataSource();
 
 
     @Override
     public Connection getConnection() throws SQLException {
-        return getDatasource().getConnection();
+        return findDataSource().getConnection();
     }
 
     @Override
     public Connection getConnection(String username, String password) throws SQLException {
-        return getDatasource().getConnection(username, password);
+        return findDataSource().getConnection(username, password);
     }
 
     @Override
     public PrintWriter getLogWriter() throws SQLException {
-        return getDatasource().getLogWriter();
+        return findDataSource().getLogWriter();
     }
 
     @Override
     public void setLogWriter(PrintWriter out) throws SQLException {
-        getDatasource().setLogWriter(out);
+        findDataSource().setLogWriter(out);
     }
 
     @Override
     public void setLoginTimeout(int seconds) throws SQLException {
-        getDatasource().setLoginTimeout(seconds);
+        findDataSource().setLoginTimeout(seconds);
     }
 
     @Override
     public int getLoginTimeout() throws SQLException {
-        return getDatasource().getLoginTimeout();
+        return findDataSource().getLoginTimeout();
     }
 
     @Override
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-        return getDatasource().getParentLogger();
+        return findDataSource().getParentLogger();
     }
 
     @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
-        return getDatasource().unwrap(iface);
+        return findDataSource().unwrap(iface);
     }
 
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        return getDatasource().isWrapperFor(iface);
+        return findDataSource().isWrapperFor(iface);
     }
 }

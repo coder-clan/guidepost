@@ -22,15 +22,14 @@ public class MysqlDataSourceChecker implements DataSourceChecker {
     @Override
     public boolean isReadonly(DataSource dataSource) {
         try (Connection connection = dataSource.getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet rs = statement.executeQuery("SELECT @@GLOBAL.read_only");
         ) {
-            Statement statement = connection.createStatement();
-            ResultSet rs = statement.executeQuery("SELECT @@GLOBAL.super_read_only");
             if (rs.next()) {
                 final boolean readonly = rs.getBoolean(1);
                 log.trace("Datasource：{}, readonly: {}", dataSource, readonly);
                 return readonly;
             }
-
         } catch (SQLException e) {
             throw new RuntimeException("Exception countered while determining writability of the DataSource.", e);
         }

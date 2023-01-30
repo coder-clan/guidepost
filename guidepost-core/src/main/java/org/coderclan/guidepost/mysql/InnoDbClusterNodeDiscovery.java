@@ -7,10 +7,12 @@ import org.coderclan.guidepost.datasource.NamedDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.sql.DataSource;
 import java.io.Closeable;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Collections;
@@ -29,6 +31,27 @@ import java.util.stream.Collectors;
 public class InnoDbClusterNodeDiscovery implements DatabaseNodeDiscovery {
     private static Logger log = LoggerFactory.getLogger(InnoDbClusterNodeDiscovery.class);
 
+    @Autowired
+    private DataSourceChecker checker;
+
+    @Autowired
+    private DataSourceBuilder dataSourceBuilder;
+
+    /**
+     * Interval of getting database nodes. Unit: second. default: 10
+     */
+    @Value("${org.coderclan.guidepost.discovery.refreshInterval:10}")
+    private int refreshInterval = 10;
+    private final List<NamedDataSource> readOnlyDataSources = new CopyOnWriteArrayList<>();
+    private final List<NamedDataSource> writableDataSources = new CopyOnWriteArrayList<>();
+    private final List<NamedDataSource> unmodifiableReadONlyDataSources = Collections.unmodifiableList(readOnlyDataSources);
+    private final List<NamedDataSource> unmodifiableWritableDataSources = Collections.unmodifiableList(writableDataSources);
+
+    /**
+     * private use only.
+     */
+    private final HashMap<String, NamedDataSource> dataSourceMap = new HashMap<>();
+    private boolean supported;
     private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
         @Override
         public Thread newThread(Runnable r) {
@@ -39,24 +62,14 @@ public class InnoDbClusterNodeDiscovery implements DatabaseNodeDiscovery {
         }
     });
 
-    @Autowired
-    private DataSourceChecker checker;
-
-    @Autowired
-    private DataSourceBuilder dataSourceBuilder;
-
-    private final List<NamedDataSource> readOnlyDataSources = new CopyOnWriteArrayList<>();
-    private final List<NamedDataSource> writableDataSources = new CopyOnWriteArrayList<>();
-    private final List<NamedDataSource> unmodifiableReadONlyDataSources = Collections.unmodifiableList(readOnlyDataSources);
-    private final List<NamedDataSource> unmodifiableWritableDataSources = Collections.unmodifiableList(writableDataSources);
-
-    /**
-     * private use only.
-     */
-    private final HashMap<String, NamedDataSource> dataSourceMap = new HashMap<>();
-
     @Override
     public void setSeed(NamedDataSource seed) {
+        this.supported = isMysql(seed);
+        if (!this.supported) {
+            log.error("The seed dataSource is not MySQL. Node Discovery is disabled!");
+            this.writableDataSources.add(seed);
+            return;
+        }
 
         this.dataSourceMap.put(seed.getName(), seed);
 
@@ -69,7 +82,10 @@ public class InnoDbClusterNodeDiscovery implements DatabaseNodeDiscovery {
 
     @Override
     public void run() {
-        executorService.scheduleWithFixedDelay(this::refresh, 0, 30, TimeUnit.SECONDS);
+        if (this.supported) {
+
+            executorService.scheduleWithFixedDelay(this::refresh, 0, refreshInterval, TimeUnit.SECONDS);
+        }
     }
 
     @Override
@@ -145,6 +161,7 @@ public class InnoDbClusterNodeDiscovery implements DatabaseNodeDiscovery {
                     log.trace("Underlying DataSource of {} is already created", address);
                     return;
                 }
+                log.info("Database node added. Address: {}", address);
                 createDataSource(address);
             });
 
@@ -169,5 +186,15 @@ public class InnoDbClusterNodeDiscovery implements DatabaseNodeDiscovery {
         }
 
         this.dataSourceMap.put(address, nds);
+    }
+
+    public boolean isMysql(DataSource dataSource) {
+        try (Connection connection = dataSource.getConnection()) {
+            DatabaseMetaData meta = connection.getMetaData();
+            return "MySQL".equalsIgnoreCase(meta.getDatabaseProductName());
+        } catch (Exception e) {
+            log.error("Failed to determine if database is MySQL.", e);
+            return false;
+        }
     }
 }

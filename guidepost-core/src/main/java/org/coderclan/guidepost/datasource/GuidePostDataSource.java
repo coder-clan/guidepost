@@ -43,7 +43,7 @@ public class GuidePostDataSource extends AbstractDataSourceWrapper {
     }
 
     @Override
-    protected DataSource getDatasource() {
+    protected DataSource findDataSource() {
         boolean readOnly = this.readWriteDetector.isCurrentTransactionReadOnly();
         log.debug("isCurrentTransactionReadOnly: {}", readOnly);
 

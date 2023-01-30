@@ -19,6 +19,14 @@ spring:
       hibernate:
         connection:
           handling_mode: "DELAYED_ACQUISITION_AND_RELEASE_AFTER_TRANSACTION"
+org:
+  coderclan:
+    guidepost:
+      discovery:
+        # Guidepost will periodically get Database nodes information.
+        # This property configure the interval between each operation. Unit: second.
+        refreshInterval: 20
+
 logging:
   level:
     org:
